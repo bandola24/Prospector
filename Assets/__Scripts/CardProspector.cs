@@ -14,5 +14,5 @@ public class CardProspector : Card {
 	public CardState state = CardState.drawpile;
 	public List<CardProspector> hiddenBy = new List<CardProspector> ();
 	public int layoutID;
-	public SlotDef slotdef;
+	public SlotDef slotDef;
 }
