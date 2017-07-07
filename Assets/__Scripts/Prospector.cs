@@ -40,6 +40,9 @@ public class Prospector : MonoBehaviour {
 	public Layout layout;
 	public TextAsset layoutXML;
 
+	public GUIText GTGameOver;
+	public GUIText GTRoundResult;
+
 	void Awake(){
 		S = this;
 		if (PlayerPrefs.HasKey ("ProspectorHighScore")) {
@@ -47,8 +50,25 @@ public class Prospector : MonoBehaviour {
 		}
 		score += SCORE_FROM_PREV_ROUND;
 		SCORE_FROM_PREV_ROUND = 0;
+		GameObject go = GameObject.Find ("GameOver");
+		if (go != null) {
+			GTGameOver = go.GetComponent<GUIText> ();
+		}
+		go = GameObject.Find ("RoundResult");
+		if (go != null) {
+			GTRoundResult = go.GetComponent<GUIText> ();
+		}
+		ShowResultGTs (false);
+		go = GameObject.Find ("Highscore");
+		string hScore = "High Score: " + Utils.AddCommasToNumber (HIGH_SCORE);
+		go.GetComponent<GUIText> ().text = hScore;
 	}
 		
+	void ShowResultGTs(bool show){
+		GTGameOver.gameObject.SetActive(show);
+		GTRoundResult.gameObject.SetActive (show);
+	}
+
 	void Start() {
 		Scoreboard.S.score = score;
 		deck = GetComponent<Deck> ();
@@ -276,17 +296,25 @@ public class Prospector : MonoBehaviour {
 		}
 		switch (sEvt) {
 		case ScoreEvent.gameWin:
+			GTGameOver.text = "Round Over";
 			Prospector.SCORE_FROM_PREV_ROUND = score;
 			print ("You won this round! Round score " + score);
+			GTRoundResult.text = "You won this round!/nRound Score: " + score;
+			ShowResultGTs (true);
 			break;
 		case ScoreEvent.gameLoss:
+			GTGameOver.text = "Game Over";
 			if (Prospector.HIGH_SCORE <= score) {
 				print ("You got the high score! High score: " + score);
+				string sRR = "You got the high score!/nHigh score: " + score;
+				GTRoundResult.text = sRR;
 				Prospector.HIGH_SCORE = score;
 				PlayerPrefs.SetInt ("ProspectorHighScore", score);
 			} else {
 				print ("Your final score for the game was: " + score);
+				GTRoundResult.text = "Your final score was: " + score;
 			}
+			ShowResultGTs (true);
 			break;
 		default:
 			print ("score: " + score + " scoreRun:" + scoreRun + " chain:" + chain);
